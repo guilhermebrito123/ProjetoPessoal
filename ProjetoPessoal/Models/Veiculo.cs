@@ -16,9 +16,11 @@ namespace ProjetoPessoal.Models
         public string Placa { get; set; }
 
         [Required(ErrorMessage = "O campo AnoFabricacao é obrigatório!")]
+        [Display(Name = "Ano de fabricação")]
         public int AnoFabricacao { get; set; }
 
         [Required(ErrorMessage = "O campo AnoModelo é obrigatório!")]
+        [Display(Name = "Ano do modelo")]
         public int AnoModelo { get; set; }
     }
 }
