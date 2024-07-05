@@ -34,5 +34,36 @@ namespace ProjetoPessoal.Controllers
             }
             return View(veiculo);//Se os dados não forem válidos, a View original será retornada com msgns de erro
         }
+        public async Task<IActionResult> Edit(int? id)//? significa que ele pode ser null, que, caso seja o caso, retornará uma página vazia
+        {
+            if(id == null)
+                return NotFound();//aqui é o status 404 (recurso não encontrado)
+
+            var dados = await _context.Veiculos.FindAsync(id);//método Find() faz uma consulta no bd
+            if(dados == null)
+                return NotFound();
+            return View(dados);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, Veiculo veiculo)//Aqui eu recebo como dados de entrada o id informado e achado e os dados do veículo específico para poder editá-los
+        {
+            if(id != veiculo.Id)
+                return NotFound();
+            _context.Veiculos.Update(veiculo);//Estou atualizando meus dados no bd
+            await _context.SaveChangesAsync();//Salvo as minhas informações no meu bd.
+
+            return RedirectToAction("Index");//Retorno para a minha Index onde serão exibidos todos os cadastros
+        }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            var dados = await _context.Veiculos.FindAsync(id);//puxo os dados do veículo que possui o parâmetro de entrada.
+            if (dados == null)
+                return NotFound();
+
+            return View(dados);
+        }
+
     }
 }
