@@ -1,13 +1,14 @@
 ﻿@model ProjetoPessoal.Models.Veiculo
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Delete";
 }
 
-<h1>Detalhes</h1>
+<h1>Deletando @Model.Nome</h1>
 
+<h3>Confirma que deseja apagar esse veículo?</h3>
 <div>
-    <h4>@Model.Nome</h4>
+    <h4>Veiculo</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -35,8 +36,10 @@
             @Html.DisplayFor(model => model.AnoModelo)
         </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning">Editar</a> |
-    <a asp-action="Index" class="btn btn-info">Voltar</a>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Apagar" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-info">Back to List</a>
+    </form>
 </div>

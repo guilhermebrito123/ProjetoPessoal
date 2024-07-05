@@ -64,6 +64,29 @@ namespace ProjetoPessoal.Controllers
 
             return View(dados);
         }
+        public async Task<IActionResult> Delete(int? id)//Esse método que também é do tipo get será responsável por retornar as informações do veículo específico na tela
+        {
+            if (id == null)
+                return NotFound();
+            var dados = await _context.Veiculos.FindAsync(id);//puxo os dados do veículo que possui o parâmetro de entrada.
+            if (dados == null)
+                return NotFound();
 
+            return View(dados);//Aqui haverá a escolha se deseja ou não apagar os dados de forma definitiva.
+        }
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            var dados = await _context.Veiculos.FindAsync(id);//puxo os dados do veículo que possui o parâmetro de entrada.
+            if (dados == null)
+                return NotFound();
+            _context.Veiculos.Remove(dados);//Removerá esses dados armazenados na variável dados do bd.
+            await _context.SaveChangesAsync();//Salvará essas exclusões
+
+
+            return RedirectToAction("Index");//Redirecionará após todo o processo anterior feito, para a minha view index.
+        }
     }
 }
