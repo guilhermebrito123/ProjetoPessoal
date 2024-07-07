@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjetoPessoal.Models;
+using System.Linq;
 
 namespace ProjetoPessoal.Controllers
 {
@@ -87,6 +88,29 @@ namespace ProjetoPessoal.Controllers
 
 
             return RedirectToAction("Index");//Redirecionará após todo o processo anterior feito, para a minha view index.
+        }
+
+        public async Task<IActionResult> Relatorio(int? id)
+        {
+            if (id == null)
+            
+                return NotFound();
+            
+            var veiculo = await _context.Veiculos.FindAsync(id);
+
+            if(veiculo == null)
+            
+                return NotFound();
+            
+            var consumos = await _context.Consumos.Where(c => c.VeiculoId == id).OrderByDescending(c => c.Data).ToListAsync();
+
+            decimal total = consumos.Sum(c => c.Valor);
+
+            ViewBag.Total = total;
+            ViewBag.Veiculo = veiculo;
+
+
+            return View(consumos);
         }
     }
 }
