@@ -22,5 +22,8 @@ namespace ProjetoPessoal.Models
         [Required(ErrorMessage = "O campo Ano do modelo é obrigatório!")]
         [Display(Name = "Ano do modelo")]
         public int AnoModelo { get; set; }
+        
+        //Um veículo está associado a vários consumos:
+        public ICollection<Consumo> Consumos { get; set; }
     }
 }
