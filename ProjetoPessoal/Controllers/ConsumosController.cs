@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjetoPessoal.Models;
 
 namespace ProjetoPessoal.Controllers
 {
+    [Authorize]
     public class ConsumosController : Controller
     {
         private readonly AppDbContext _context;

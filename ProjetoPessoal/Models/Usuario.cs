@@ -19,6 +19,10 @@ namespace ProjetoPessoal.Models
         [Required(ErrorMessage = "Obrigatório informar o tipo de perfil")]
         public Perfil Perfil { get; set; }
 
+        public static implicit operator string(Usuario v)
+        {
+            throw new NotImplementedException();
+        }
     }
     public enum Perfil
     {

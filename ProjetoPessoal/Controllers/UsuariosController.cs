@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjetoPessoal.Models;
+using System.Security.Claims;
 
 namespace ProjetoPessoal.Controllers
 {
@@ -13,6 +16,7 @@ namespace ProjetoPessoal.Controllers
         }
 
         //GET: Usuarios:
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Usuarios.ToListAsync());
@@ -36,6 +40,8 @@ namespace ProjetoPessoal.Controllers
         }
 
         //GET: Usuarios/Create
+
+
         public IActionResult Create()
         {
             return View();
@@ -54,7 +60,7 @@ namespace ProjetoPessoal.Controllers
                 usuario.Senha = BCrypt.Net.BCrypt.HashPassword(usuario.Senha);
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                return RedirectToAction("Login");
             }
             return View(usuario);
         }
@@ -148,6 +154,66 @@ namespace ProjetoPessoal.Controllers
         private bool UsuarioExists(int id)
         {
             return _context.Usuarios.Any(e => e.Id == id);
+        }
+
+        [AllowAnonymous]
+        public IActionResult login()
+        {
+            return View();
+        }
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> login(Usuario usuario)
+        {
+            var dados = await _context.Usuarios.FindAsync(usuario.Id);
+            if(dados == null)
+            {
+                ViewBag.Message = "Usuário e/ ou senha inválidos";
+                return View();
+            }
+
+            bool SenhaOk = BCrypt.Net.BCrypt.Verify(usuario.Senha, dados.Senha);
+            if (SenhaOk)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, dados.Nome),
+                    new Claim(ClaimTypes.NameIdentifier, dados.Id.ToString()),
+                    new Claim(ClaimTypes.Role, dados.Perfil.ToString())
+                };
+                var usuarioIdentity = new ClaimsIdentity(claims, "login");
+                ClaimsPrincipal principal = new ClaimsPrincipal(usuarioIdentity);
+
+                var props = new AuthenticationProperties
+                {
+                    AllowRefresh = true,
+                    ExpiresUtc = DateTime.UtcNow.ToLocalTime().AddHours(8),
+                    IsPersistent = true,
+                };
+
+                await HttpContext.SignInAsync(principal, props);  
+                
+                return Redirect("/");
+            }
+            else
+            {
+                ViewBag.Message = "Usuário e/ ou senha inválidos";
+            }
+
+            return View();
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("login", "Usuarios");
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

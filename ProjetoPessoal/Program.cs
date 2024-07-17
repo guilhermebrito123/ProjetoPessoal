@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using ProjetoPessoal.Models;
+using System.Security.Policy;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,20 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 builder.Services.AddDbContext<AppDbContext>
     (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    //This Lambda determines whether user content for non-essential cookies is needed for a given request.
+    options.CheckConsentNeeded = context => true;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.AccessDeniedPath = "/Usuarios/AccessDenied/";
+        options.LoginPath = "/Usuarios/Login";
+    });
 
 var app = builder.Build();
 
@@ -26,7 +42,18 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+//Configurando minha URL para ficar mais fácil seu acesso:
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "VeiculosEdit",
+        pattern: "Edit/{id}",
+        defaults: new { controller = "Veiculos", action = "Edit" });
+});
+
 
 app.MapControllerRoute(
     name: "default",

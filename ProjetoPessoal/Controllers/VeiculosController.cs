@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjetoPessoal.Models;
 using System.Linq;
 
 namespace ProjetoPessoal.Controllers
 {
+    [Authorize]
     public class VeiculosController : Controller
     {
         private readonly AppDbContext _context;//esse _context é o contexto do bd, éa variável que está conectada ao meu contexto do bd, através dela o meu controller terá acesso aos dados.
